@@ -1,0 +1,144 @@
+---
+title: "Homework1"
+author: "Yanyu Zheng yz2690"
+date: "January 30, 2016"
+output: pdf_document
+---
+
+#Homework 1
+##Problem 1
+Use independence_test from the coin package to do permutation test on the data.
+```{r}
+# install.packages("coin")
+library("coin")
+#type in the data
+score = c(68, 77, 82, 85, 53, 64, 71)
+group = c("A","A","A","A", "B","B","B")
+group = as.factor(group)
+independence_test(score~group)
+```
+
+##Problem 2
+* Article 1: Belatacept and Long-Term Outcomes in Kidney Transplantation
+* URL: [Article 1](http://www.nejm.org/doi/full/10.1056/NEJMoa1506027?query=featured_home#t=articleMethods)
++ Category: The units were not selected randomly. Since obviously the patients' permission are needed fo the study. The group assignment are selected randomly.
++ Scope of conclusion: Within scope. Draw conclusion on causality.
++ study design: 
++ trial design has been published previously.18 The original study was a 3-year, international, randomized, single-blind, parallel-group study with an active control. The participants were adults who received a kidney transplant from a living or deceased donor, with deceased donors meeting standard-criteria donor status on the basis of age and other benchmarks. Patients were randomly assigned (in a 1:1:1 ratio) to a more-intensive belatacept-based regimen, a less-intensive belatacept-based regimen, or a cyclosporine-based regimen for primary immunosuppression. All patients received basiliximab induction, mycophenolate mofetil, and glucocorticoids. Patients were eligible to continue with the assigned therapy beyond 36 months if they provided written informed consent and if they received the approval of their physician. After 36 months, patients were required to continue the assigned regimen to remain in the study.
+The study was conducted in accordance with the Declaration of Helsinki. The ethics committee at each site approved the study protocol. All patients provided written informed consent.
++ Conclusion:
++ The trial design has been published previously.18 The original study was a 3-year, international, randomized, single-blind, parallel-group study with an active control. The participants were adults who received a kidney transplant from a living or deceased donor, with deceased donors meeting standard-criteria donor status on the basis of age and other benchmarks. Patients were randomly assigned (in a 1:1:1 ratio) to a more-intensive belatacept-based regimen, a less-intensive belatacept-based regimen, or a cyclosporine-based regimen for primary immunosuppression. All patients received basiliximab induction, mycophenolate mofetil, and glucocorticoids. Patients were eligible to continue with the assigned therapy beyond 36 months if they provided written informed consent and if they received the approval of their physician. After 36 months, patients were required to continue the assigned regimen to remain in the study.
+The study was conducted in accordance with the Declaration of Helsinki. The ethics committee at each site approved the study protocol. All patients provided written informed consent.
+
+* Article 2: Targeting BCL2 with Venetoclax in Relapsed Chronic Lymphocytic Leukemia
++ URL: http://www.nejm.org/doi/full/10.1056/NEJMoa1513257#t=articleMethods
++ Category: The units were not selected randomly. Since obviously the patients' permission are needed fo the study. The group assignment are selected randomly.
++ Scope of conclusion: Within scope. Draw conclusion on causality.
++ study design: 
++ This study was designed as an open-label, multicenter, dose-escalation trial of venetoclax in patients with relapsed or refractory CLL or SLL or with non-Hodgkin’s lymphoma. All patients received active treatment. The results among patients with relapsed or refractory CLL or SLL are reported here. From June 2011 through December 2012, we enrolled patients in eight dose-escalation groups. From June 2013 through May 2014, we enrolled patients in an expansion cohort that received the dosing regimen that was based on data from the earlier part of the trial.
++ Conclusion:
++ Venetoclax was active at all doses that were studied and induced deep reductions in the CLL burden in the blood, lymph nodes, and marrow (Figure 1D, 1E, and 1F). Responses according to IWCLL criteria were observed in all dose-escalation groups (Table S9 in the Supplementary Appendix). Among the 56 patients in the dose-escalation cohort, the pooled overall response rate was 77%, with 30% having either a complete response or a complete response with incomplete count recovery (hereafter collectively referred to as a complete response) (Table 3TABLE 3
+Complete and Overall Response Rates, According to Cohort and Subgroup.
+, and Table S10 in the Supplementary Appendix). The median time until the first objective response was 6 weeks (range, 5 to 24). The median time until the determination of a complete response was longer (median, 6 months; range, 3 to 19); three complete responses were first reported more than 1 year after the initiation of treatment (Fig. S4 in the Supplementary Appendix).
+
+##Problem 3
+* a
+* Null: variations in zinc level is not a side effect of dietary supplementation of calcium.
++ Alteernative: variations in zinc level is a side effect of dietary supplementation of calcium.
+
++ b
+```{r}
+groupA = c(1.31,1.45,1.12,1.16,1.30,1.50,1.20,1.22,1.42,1.14,1.23,1.59,1.11,1.10,1.53,1.52,1.17,1.49,1.62,1.29)
+groupB = c(1.13,1.71,1.39,1.15,1.33,1.00,1.03,1.68,1.76,1.55,1.34,1.47,1.74,1.74,1.19,1.15,1.20,1.59,1.47)
+data = c(groupA, groupB)
+disMean = vector()
+#Generate 1000 samples
+set.seed(7)
+for(i in 1:1000){
+  sam = sample(length(data),length(groupA))
+  samA = data[sam]
+  samB = data[-sam]
+  dis = mean(samA) - mean(samB)
+  disMean = c(disMean, dis)
+}
+#Put the true mean diff in and see the index to find the pvalue
+testStatic = mean(groupA)-mean(groupB)
+disMean = c(disMean,testStatic)
+disMean = sort(disMean)
+index = match(testStatic, disMean)
+#index = 131 < 500.5
+pValue = index/1001*2
+```
+* the 2Pvalue of the test is `r pValue`
+
+* c
+* The reference distribution is as follows
+```{r, echo=FALSE}
+hist(disMean[-index])
+```
+##Problem 4
+* a Since the degree of freedom is 1095, we can just use the Normal Distribution to estimate.
+```{r}
+diff = 280
+q = qt(0.975, 1095)
+aCI = c(diff - 46.66*q, diff + 46.66*q)
+```
+* The 95% CI is `r aCI`.
+
+* b
+```{r}
+q = qt(0.95, 1095)
+bCI = c(diff - 46.66*q, diff + 46.66*q)
+```
+* The 90% CI is `r bCI`.
+
+* c
+```{r}
+t = 280/46.66
+p = 1 - pt(t, 1095)
+pValue = 2*p
+```
+* The pvalue is 2.664672e-09.
+
+##Problem 5
+```{r}
+library("Sleuth3")
+attach(ex0112)
+testTS = t.test(BP~Diet, ex0112)
+testOS = t.test(BP~Diet, ex0112, alternative = "greater")
+```
+* The 95% confidence interval is `r testTS$conf.int`
+* The one-sided pvalue is `r testOS$p.value`
+
+##Problem 6
+```{r}
+attach(case0101)
+testOS = t.test(Score~Treatment, case0101, alternative = "less")
+testOS
+```
+
+##Problem 7
+* Fist, we want to try a permutation test. Since it does not require any prior assumptions on the data.
+```{r}
+attach(ex0223)
+library("coin")
+iTest = independence_test(PctChange~SpeedLimit, ex0223, alternative = "greater")
+```
+* From the result, we know the difference is not significant at all. Then we try to use a two-sample t test. However, in order to use a two sample t test, we have to check if the sample are approximately normally distributted and have similar variance.
+```{r}
+subInc = ex0223[ex0223$SpeedLimit=="Inc",]
+subRet = ex0223[ex0223$SpeedLimit=="Ret",]
+varInc = var(subInc$PctChange)
+varRet = var(subRet$PctChange)
+```
+* Variance of Inc group and variance of Ret group is close. As for normality.
+```{r}
+qqnorm(subInc$PctChange)
+qqnorm(subRet$PctChange)
+```
+* Finally, let's try two sample t test.
+```{r}
+t.test(PctChange~SpeedLimit, ex0223, alternative = "greater")
+```
+* Still, not significant. So we conclude that there's no significant diffrence between the two groups.
+

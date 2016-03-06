@@ -1,0 +1,142 @@
+---
+title: "Homework2"
+author: "Yanyu Zheng yz2690"
+date: "February 8, 2016"
+output: pdf_document
+---
+# Problem 1
+## a          
+Since $\mu$ is 0, $\frac{\sum_{i=1}^{n} X^2_i}{n\sigma^2}$ follows chi-square(n). Suppose (a,b) is the (0.025, 0.975) quantile of chi-square(n). The 95% confidence interval of $\sigma^2$ is ($\frac{\sum_{i=1}^{n} X^2_i}{b}$, $\frac{\sum_{i=1}^{n} X^2_i}{a}$)
+
+## b     
+Since $\mu$ is 0, we estimate $\mu$ by $\bar{x} = frac{\sum_{i=1}^{n} X_i}{n}$. And $\frac{\sum_{i=1}^{n} (X_i-\bar{x})^2}{n\sigma^2}$ follows chi-square(n-1). Suppose (c,d) is the (0.025, 0.975) quantile of chi-square(n-1). The 95% confidence interval of $\sigma^2$ is ($\frac{\sum_{i=1}^{n} (X_i-\bar{x})^2}{d}$, $\frac{\sum_{i=1}^{n} (X_i-\bar{x})^2}{c}$)
+
+## c
+```{r}
+set.seed(1)
+outcome = vector()
+upper = qchisq(0.975,10)
+lower = qchisq(0.025,10)
+for(i in 1:1000){
+  sample = rnorm(10)
+  var = var(sample)
+  if(9*var<=upper && 9*var>=lower){
+    outcome = c(outcome,1)
+  }else{
+    outcome = c(outcome,0)
+  }
+}
+perc = sum(outcome)/length(outcome)
+```
+The percentage of coverage is `r perc`.
+
+# Problem 2
+## a
+```{r, message = FALSE}
+## Load the data and library
+library("Sleuth3")
+library("dplyr")
+attach(case0802)
+## Clean the data
+Y1 = case0802 %>%
+filter(Voltage == 26) %>%
+select(Time) %>%
+transmute(logTime = log(Time))
+Y2 = case0802 %>%
+filter(Voltage == 28) %>%
+select(Time) %>%
+transmute(logTime = log(Time))
+Y1 = as.matrix(Y1)
+Y2 = as.matrix(Y2)
+tStatistic = mean(Y1)-mean(Y2)
+```
+$Y_1$ = `r Y1`
+$Y_2$ = `r Y2` 
+
+## b      
+The difference is `r tStatistic` 
+
+## c      
+The antilogarithm of the estimate is `r exp(tStatistic)` It's the multicative treatment effect on the original scale of measurement.          
+
+## d        
+```{r}
+n1 = nrow(Y1)
+n2 = nrow(Y2)
+s1 = var(Y1)
+s2 = var(Y2)
+sp = sqrt((n1-1)*s1^2 + (n2-2)*s2^2)/sqrt(n1+n2-2)
+se = sp*sqrt(1/n1+1/n2)
+lb = qt(0.025, n1+n2-2)
+ub = qt(0.975, n1+n2-2)
+ci = c(tStatistic+lb*se, tStatistic+ub*se)
+ratio = exp(ci[2])
+#
+```
+The 95% confidence interval is $`r ci`$. The antilogarithms of the endpoints is $`r ratio`$. Which means $\frac{\bar{Y_1}}{\bar{Y_2}}$ has a probability of 95% to be less than $`r ratio`$
+
+# Problem3
+```{r}
+attach(case0302)
+##With the two largest dioxin levels in the Vietnam veterans group
+t.test(Dioxin~Veteran,case0302, alternative = "less")
+case0302[which.max(Dioxin),]
+case0302D = case0302[-which.max(Dioxin),]
+case0302D[which.max(case0302D$Dioxin),]
+case0302D = case0302D[-which.max(case0302D$Dioxin),]
+##Without the two largest dioxin levels in the Vietnam veterans group
+t.test(Dioxin~Veteran,case0302D, alternative = "less")
+```
+
+# Problem4
+```{r}
+attach(ex0221)
+t.test(Humerus~Status, ex0221)
+ex0221D = ex0221[-which.min(Humerus),]
+t.test(Humerus~Status, ex0221D)
+```
+* P-value with outlier: 0.09236
+* p-value without outlier: 0.176         
+Yes. The conclusion does not depends on this one single data.             
+We should look into this special case to see if there was error in the process of obtaining it. If there is, we can either correct or exclude it from the sample. If not, we can try test methods that's more robust to outlyers like rank-sum test. And if we still want to stick with t-test, we have to first examine if the distribution is normal. If it is, draw more samples.
+
+# Problem5
+```{r}
+attach(ex0332)
+## Use paired t-test for problem(a)
+ex0332D = ex0332[Type=="Public",]
+t.test(ex0332D$InState, ex0332D$OutOfState, alternative = "less", paired = TRUE)
+## Use Welch t-test for problem(b)
+t.test(InState~Type, ex0332, alternative = "greater")
+## Use Welch t-test for problem(c)
+t.test(OutOfState~Type, ex0332, alternative = "greater")
+```
+From the p-values, we can see how much they differ.
+
+# Problem6
+
+## a
+```{r}
+attach(ex0221)
+wilcox.test(Humerus~Status, ex0221)
+```
+The two-sided p-value is 0.1718
+
+## b
+It reported the one based on the normal approximation.
+
+## c
+Yes. It use a continuity correction.
+
+## d
+The p-value of the rank-sum test is higher compared to t-test with the smallest observation and lower than the t-test without the smallest observation.
+
+## e 
+Two-sample t-test is more powerful but less robust. And the strategy we can use for dealing with outliers are limited, especially if the outlier is sampled from the targeted distribution, obtained without error. Then we can only try to get more samples to diminish the influence of a single outlier. While rank-sum test is more robust but less powerful.
+
+
+
+
+
+
+

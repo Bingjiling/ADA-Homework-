@@ -1,0 +1,108 @@
+---
+title: "Homework4"
+author: "Yanyu Zheng yz2690"
+date: "February 18, 2016"
+output: pdf_document
+---
+
+# 1. Chapter 5, problem 23 
+
+```{r}
+library("Sleuth3")
+attach(ex0523)
+anova(lm(Oxygen ~ Bone, ex0523))
+```
+
+The pValue is 9.73e-07, which means there's evidence that the means are dif- ferent for the different bones.
+
+# 2. Chapter 5, problem 25 
+
+```{r}
+attach(ex0525)
+anova(lm(log(Income2005) ~ Educ, ex0525))
+```
+
+The pValue is less than 2.2e-16 for log scale, which means the evidence is very strong for the diffenrece in income in different groups.
+
+```{r}
+## 12   13-15    16    >16
+t.test(ex0525[Educ=="12","Income2005"],ex0525[Educ=="13-15","Income2005"],alternative = "less")
+t.test(ex0525[Educ=="13-15","Income2005"],ex0525[Educ=="16","Income2005"],alternative = "less")
+t.test(ex0525[Educ=="16","Income2005"],ex0525[Educ==">16","Income2005"],alternative = "less")
+```
+12 & 13-15  5346.347                
+13-15 & 16  19426.6                   
+16 & >16    798.1295                                 
+
+# 3. Chapter 6, problem 12 
+
+```{r}
+attach(case0601)
+library("dplyr")
+data3 = case0601 %>% 
+  filter(Handicap!="None") %>%
+  group_by(Handicap) %>%
+  summarise(mean = mean(Score),sd = sd(Score),n=n())
+attach(data3)
+coef = c(1/3,1/3,-1,1/3)
+g = sum(coef*mean)
+pooled = sqrt(sum(sd^2*(n-1))/sum(n-1))
+SE = pooled*sqrt(sum(coef^2/n))
+tStatistic = g/SE
+## Planned comparison
+pValue = 1-pt(tStatistic,52)
+## Unplanned comparison
+qTukey = qtukey(0.95,4,52)/sqrt(2)
+```
+Test statistic is `r tStatistic`. The pValue for the planned test is `r pValue`. The threshold for Tukey-Kramer test is `r qTukey`, which is larger than our test Statistic. So pValue > 0.05. 
+
+# 4. Chapter 6, problem 15 
+
+* a
+
+```{r}
+mean = c(30.20,28.80,26.20,31.10,30.20)
+sd = c(3.82,5.26,4.66,4.91,3.53)
+n = rep(9,5)
+pooled = sqrt(sum((n-1)*sd^2)/sum(n-1))
+```
+The pooled estimate of the standard deviation is `r pooled`
+
+*b
+
+-1/3, 1/2, 1/2,-1/3, -1/3
+
+*c
+
+```{r}
+coeff = c(1/3, -1/2, -1/2, 1/3, 1/3)
+g = sum(coeff * mean)
+sdG = pooled*sqrt(sum(coeff^2/n))
+tStatistic = g/sdG
+q = qt(0.975,40)
+CI = c(g-sdG*q, g+sdG*q)
+```
+tStatistic is `r tStatistic`, qt(0.975,40) is `r q`, 95% confidence interval is `r CI`
+
+# 5. Chapter 6, problem 16 
+```{r}
+LSD = qt(0.975,30)
+# F value is large, no need for protected LSD
+protectedLSD = qt(0.975,30)
+tukey = qtukey(0.95,6,30)/sqrt(2)
+bonferroni = qt(1-0.05/30,30)
+sheffe = sqrt(5*qf(0.95,5,30))
+```
+LSD : `r LSD`                    
+protectedLSD : `r protectedLSD`                         
+tukey : `r tukey`                                             
+bonferroni : `r bonferroni`                               
+sheffe : `r sheffe`                                    
+
+# 6. Chapter 6, problem 23
+
+```{r}
+attach(ex1420)
+TukeyHSD(aov(WtLoss24~Diet, ex1420))
+```
+From the result, we can see that the low-fat and the low-carbohydrate group is significantly different. 95% CI is (-4.224771,-0.1408361)
