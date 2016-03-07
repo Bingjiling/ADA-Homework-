@@ -1,0 +1,113 @@
+---
+title: "Homework6"
+author: "Yanyu Zheng yz2690"
+date: "March 5, 2016"
+output: pdf_document
+---
+# 1. Chapter 9, problem 14 
+```{r, results = "hide", message = FALSE}
+pack = c("Sleuth3", "dplyr", "ggplot2", "car")
+lapply(pack, library, character.only = TRUE)
+```
+
+## a
+
+```{r}
+attach(ex0914)
+pairs(ex0914)
+```
+
+## b
+
+```{r}
+fit = lm(Heart ~ Bank + Walk + Talk, ex0914)
+fit
+```
+
+## c
+
+```{r}
+plot(fit$fitted.values,fit$residuals)
+```
+
+### The variance of residuals seem to be constant throughout all levels of the fitted value. And no evidence for outliers was found.
+
+## d
+
+```{r}
+summary(fit)
+detach(ex0914)
+```
+
+# 2. Chapter 9, problem 16 
+
+## a
+
+```{r}
+attach(ex0327)
+scatterplot(PollenRemoved ~ DurationOfVisit | BeeType, ex0327, smoother = FALSE, reg.line = FALSE)
+```
+
+### No. It does not appear to be a straight line.
+
+## b
+
+```{r}
+scatterplot(logit(PollenRemoved) ~ DurationOfVisit | BeeType, ex0327, smoother = FALSE, reg.line = FALSE)
+```
+
+## c
+
+```{r}
+scatterplot(logit(PollenRemoved) ~ log(DurationOfVisit) | BeeType, ex0327, smoother = FALSE, reg.line = FALSE)
+```
+
+### Logit VS Log seems most resonable to persuit.
+
+## d
+
+```{r}
+fit2 = lm(logit(PollenRemoved) ~ log(DurationOfVisit) + BeeType + DurationOfVisit*BeeType)
+summary(fit2)
+```
+
+### The pValue is 0.73, wchich means there's no evidence indicating the proportion of pollen depends on duration of visit differently for queens than for workers.
+
+## e
+
+```{r}
+fit2e = lm(logit(PollenRemoved) ~ log(DurationOfVisit) + BeeType)
+summary(fit2e)
+detach(ex0327)
+```
+
+### Yes, queens tend to remove a smaller proportion. The cross term has high correlation with the BeeType variable, making the model highly unstable. So the diffrence in pVlue is not surprising when removing the cross term.
+
+# 3. Chapter 9, problem 18 
+
+## a
+
+```{r}
+attach(ex0918)
+library("ggplot2")
+Wings = c(Females, Males)
+data3 = data.frame(Continent = c(Continent, Continent), Latitude = c(Latitude, Latitude), Wings = Wings, Sex = as.factor(rep(c(0,1),each = length(Continent))))
+ggplot(data3, aes(x = Latitude, y = Wings, colour = factor(Continent), shape = Sex)) + geom_point(aes(size = 3))
+```
+### Yes. There's no significant difference between the data from NA and EU
+
+# 4. Chapter 9, problem 20 
+```{r}
+
+```
+
+# 5. Chapter 10, problem 19 
+```{r}
+
+```
+
+# 6. Chapter 10, problem 28
+```{r}
+
+```
+
