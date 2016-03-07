@@ -30,7 +30,7 @@ fit
 plot(fit$fitted.values,fit$residuals)
 ```
 
-### The variance of residuals seem to be constant throughout all levels of the fitted value. And no evidence for outliers was found.
+## The variance of residuals seem to be constant throughout all levels of the fitted value. And no evidence for outliers was found.
 
 ## d
 
@@ -48,7 +48,7 @@ attach(ex0327)
 scatterplot(PollenRemoved ~ DurationOfVisit | BeeType, ex0327, smoother = FALSE, reg.line = FALSE)
 ```
 
-### No. It does not appear to be a straight line.
+## No. It does not appear to be a straight line.
 
 ## b
 
@@ -62,7 +62,7 @@ scatterplot(logit(PollenRemoved) ~ DurationOfVisit | BeeType, ex0327, smoother =
 scatterplot(logit(PollenRemoved) ~ log(DurationOfVisit) | BeeType, ex0327, smoother = FALSE, reg.line = FALSE)
 ```
 
-### Logit VS Log seems most resonable to persuit.
+## Logit VS Log seems most resonable to persuit.
 
 ## d
 
@@ -71,7 +71,7 @@ fit2 = lm(logit(PollenRemoved) ~ log(DurationOfVisit) + BeeType + DurationOfVisi
 summary(fit2)
 ```
 
-### The pValue is 0.73, wchich means there's no evidence indicating the proportion of pollen depends on duration of visit differently for queens than for workers.
+## The pValue is 0.73, wchich means there's no evidence indicating the proportion of pollen depends on duration of visit differently for queens than for workers.
 
 ## e
 
@@ -81,7 +81,7 @@ summary(fit2e)
 detach(ex0327)
 ```
 
-### Yes, queens tend to remove a smaller proportion. The cross term has high correlation with the BeeType variable, making the model highly unstable. So the diffrence in pVlue is not surprising when removing the cross term.
+## Yes, queens tend to remove a smaller proportion. The cross term has high correlation with the BeeType variable, making the model highly unstable. So the diffrence in pVlue is not surprising when removing the cross term.
 
 # 3. Chapter 9, problem 18 
 
@@ -91,15 +91,50 @@ detach(ex0327)
 attach(ex0918)
 library("ggplot2")
 Wings = c(Females, Males)
-data3 = data.frame(Continent = c(Continent, Continent), Latitude = c(Latitude, Latitude), Wings = Wings, Sex = as.factor(rep(c(0,1),each = length(Continent))))
-ggplot(data3, aes(x = Latitude, y = Wings, colour = factor(Continent), shape = Sex)) + geom_point(aes(size = 3))
+data3 = data.frame(Continent = as.factor(c(Continent, Continent)), Latitude = c(Latitude, Latitude), Wings = Wings, Sex = as.factor(rep(c(0,1),each = length(Continent))))
+ggplot(data3, aes(x = Latitude, y = Wings, colour = Continent, shape = Sex)) + geom_point(aes(size = 3))
 ```
-### Yes. There's no significant difference between the data from NA and EU
+## Yes. There's no significant difference between the data from NA and EU
+
+## b
+
+```{r}
+fit3 = lm(Wings ~ Latitude + Continent + Sex + Continent*Sex, data3)
+fit3
+detach(ex0918)
+```
 
 # 4. Chapter 9, problem 20 
-```{r}
 
+```{r}
+attach(ex0920)
+plot(Year, Time)
+fit41 = lm(Time~Year)
+fit42 = lm(Time~Year + I(Year^2))
+abline(fit41)
+lines(Year,predict(fit42))
+plot(Year, Speed)
+fit43 = lm(Speed~Year)
+fit44 = lm(Speed~Year + I(Year^2))
+abline(fit43)
+lines(Year,predict(fit44))
+detach(ex0920)
 ```
+
+## Chooes the fit43, Speed described by quadratic curve of Year.
+
+## b
+
+```{r}
+data4 = ex0920 %>%
+  filter(Track == "Fast" | Track == "Slow")
+fit4b = lm(Speed~Year + I(Year^2) + Track, data4)
+fit4b
+```
+
+## Fast tracks exceeds the mean on slow tracks for a speed of 0.7848 miles per hour.
+
+## 
 
 # 5. Chapter 10, problem 19 
 ```{r}
