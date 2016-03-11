@@ -67,7 +67,8 @@ scatterplot(logit(PollenRemoved) ~ log(DurationOfVisit) | BeeType, ex0327, smoot
 ## d
 
 ```{r}
-fit2 = lm(logit(PollenRemoved) ~ log(DurationOfVisit) + BeeType + DurationOfVisit*BeeType)
+fit2 = lm(logit(PollenRemoved) ~ log(DurationOfVisit) + BeeType + log(DurationOfVisit)*BeeType)
+fit2
 summary(fit2)
 ```
 
@@ -77,6 +78,7 @@ summary(fit2)
 
 ```{r}
 fit2e = lm(logit(PollenRemoved) ~ log(DurationOfVisit) + BeeType)
+fit2e
 summary(fit2e)
 detach(ex0327)
 ```
@@ -106,6 +108,8 @@ detach(ex0918)
 
 # 4. Chapter 9, problem 20 
 
+## a
+
 ```{r}
 attach(ex0920)
 plot(Year, Time)
@@ -118,7 +122,6 @@ fit43 = lm(Speed~Year)
 fit44 = lm(Speed~Year + I(Year^2))
 abline(fit43)
 lines(Year,predict(fit44))
-detach(ex0920)
 ```
 
 ## Chooes the fit43, Speed described by quadratic curve of Year.
@@ -126,23 +129,69 @@ detach(ex0920)
 ## b
 
 ```{r}
-data4 = ex0920 %>%
-  filter(Track == "Fast" | Track == "Slow")
-fit4b = lm(Speed~Year + I(Year^2) + Track, data4)
+fit4b = lm(Speed~Year + I(Year^2) + Conditions)
 fit4b
 ```
 
-## Fast tracks exceeds the mean on slow tracks for a speed of 0.7848 miles per hour.
+## Fast tracks exceeds the mean on slow tracks for a speed of 0.9861 miles per hour.
 
-## 
+## c
+
+```{r}
+fit4c1 = lm(Speed~Year + I(Year^2) + Conditions + Starters)
+fit4c2 = lm(Speed~Year + I(Year^2) + Conditions + Starters + Starters * Conditions)
+summary(fit4c1)
+summary(fit4c2)
+detach(ex0920)
+```
+
+## There's evidence for the effect of Starters, while no evidence for the effect of the cross term of Starters and Conditions.
 
 # 5. Chapter 10, problem 19 
-```{r}
 
+## a
+
+```{r}
+data(case0901)
+fit5a = lm(Flowers ~ Intensity + Time, case0901)
+anova(fit5a)
+```
+
+## b
+
+```{r}
+fit5b = lm(Flowers ~ as.factor(Intensity) + Time + as.factor(Intensity)*Time, case0901)
+anova(fit5b)
+```
+
+## c
+```{r}
+anova(fit5b,fit5a)
 ```
 
 # 6. Chapter 10, problem 28
-```{r}
 
+## a
+
+```{r}
+attach(ex1028)
+scatterplot(Storms~ElNino, ex1028, smoother = FALSE)
 ```
 
+## We can clearly see the effect of ElNino on the Storms from the plot. The warmer it is, the less possible there's storms.
+
+## b
+
+```{r}
+scatterplot(Hurricanes~ElNino, ex1028, smoother = FALSE)
+```
+
+## We can clearly see the effect of ElNino on the Hurricanes from the plot. The warmer it is, the less possible there's Huricanes.
+
+```{r}
+anova(lm(StormIndex ~ WestAfrica + ElNino + Year))
+## Year is not significant, so I exclude if from the plot
+scatterplot(StormIndex ~ WestAfrica + ElNino, ex1028, smoother = FALSE)
+```
+
+## From the plot and F test, we can see ElNino still have inpact on StormIndex after consideration of the impact of WestAfrica and Time.
