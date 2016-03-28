@@ -1,0 +1,130 @@
+---
+title: "Homework 7"
+author: "Yanyu Zheng yz2690"
+date: "March 27, 2016"
+output: pdf_document
+---
+
+# 3. Chapter 10, problem 26
+```{r}
+library("Sleuth3")
+attach(ex1026)
+fit11 = lm(Inhibit ~ UVB + Surface + UVB:Surface)
+summary(fit11)
+```
+
+## From the summary, we can see only UVB and UVB*Surface are significant. So we build a new model with only this two variables.
+
+```{r}
+fit12 = lm(Inhibit ~ 0 + UVB + UVB:Surface)
+summary(fit12)
+detach(ex1026)
+```
+
+## Yes, the effect is different. The difference is about 939.931, which means the UVB change for 1, the change in Inhibit is 911.7 higher in surface than in deep sea. 
+
+# 4. Chapter 11, problem 8
+
+## A case with large leverage has a residual with low variability. Because its explana- tory variable values are so unusual, it dictates the location of the estimated regression over the whole region in its vicinity; no other points in the region share the responsibility. Because its residual must be small, this case acts like a mag- net on the estimated regression surface. If, however, its response falls close to the regression surface (as determined by the remaining observations alone), it is not necessarily influential. Therefore, while a large leverage does not necessarily indi- cate that the case is influential, it does imply that the case has a high potential for influence.
+
+## plot for (b)
+```{r}
+set.seed(7)
+x = c(1:9, 20)
+y = x + rnorm(10, sd = 2)
+par(mfrow=c(1,2))
+plot(x,y)
+fit41 = lm(y~x)
+abline(fit41)
+lev = hat(model.matrix(fit41))
+plot(lev)
+```
+
+## From the plot we can see the last observation has high leverage but no substantial influence on the model.
+
+## Plot for (c)
+
+```{r}
+set.seed(7)
+x = c(1:9, 20)
+y = x + rnorm(10, sd = 2)
+y[10] = 0
+par(mfrow=c(1,2))
+plot(x,y)
+fit42 = lm(y~x)
+abline(fit42)
+lev = hat(model.matrix(fit42))
+plot(lev)
+```
+
+## From the plot we can see the last observation has high leverage and completely changed the model.
+
+# 5. Chapter 11, problem 16  
+```{r}
+attach(case1101)
+fit5 = lm(Metabol ~ Sex * Gastric)
+lev = hat(model.matrix(fit5))
+stud = rstudent(fit5)
+cook = cooks.distance(fit5)
+detach(case1101)
+```
+
+## For case 32, the leverage is `r lev[32]`, studentized residual is `r stud[32]`, cook's distance is `r cook[32]`
+
+# 6. Chapter 11, problem 20
+
+## a
+
+```{r}
+attach(ex1120)
+fit61 = lm(Calcite ~ Carbonate)
+data6 = ex1120[-which.min(Carbonate),]
+fit62 = lm(Calcite ~ Carbonate, data = data6)
+data6 = data6[-which.min(data6$Carbonate),]
+fit63 = lm(Calcite ~ Carbonate, data = data6)
+```
+
+## Model with all obs
+
+```{r}
+summary(fit61)
+```
+
+## Model delete the smallest X
+
+```{r}
+summary(fit62)
+```
+
+## Model delete the smallest two X
+
+```{r}
+summary(fit63)
+```
+
+## b
+
+```{r}
+par(mfrow=c(1,1))
+plot(Carbonate, Calcite)
+abline(fit61)
+abline(fit62)
+abline(fit63)
+```
+
+## From the plot, we can see the points deleted have substantial influence on the regression line. Thus the change in R squared.
+
+## c
+```{r}
+lev = hat(model.matrix(fit61))
+plot(lev)
+```
+
+## From the plot, we can see the two smallest X have high leverage 0.56 and 0.25.
+
+## d
+```{r}
+lev = hat(model.matrix(fit62))
+plot(lev)
+```
+
