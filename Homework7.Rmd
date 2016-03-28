@@ -128,3 +128,15 @@ lev = hat(model.matrix(fit62))
 plot(lev)
 ```
 
+## From the plot, we can see the leverage of the second smallest X became 0.56 instead of 0.25. 
+
+## e
+
+## From the above computation, we can see one single observation with high would make all other points' leverage smaller. So pairs of influential observations are not commanly found since the most influential observation tend to "mask" other less influential ones.
+
+## f
+
+## The two cases have substantial influence on the model.
+
+
+
