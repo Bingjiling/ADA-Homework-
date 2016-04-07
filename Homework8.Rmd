@@ -1,0 +1,154 @@
+---
+title: "Homework8"
+author: "Yanyu Zheng yz2690"
+date: "April 6, 2016"
+output: pdf_document
+---
+
+# 1. Chapter 12, problem 17
+
+## a
+
+```{r}
+library("Sleuth3")
+library(leaps)
+library("dplyr")
+data("ex1217")
+
+fit11 = regsubsets(Mortality~.,data=ex1217[,2:14],nvmax=13,nbest=1)
+cp = summary(fit11)$cp
+BIC = summary(fit11)$bic
+plot(cp)
+plot(BIC)
+k = which.min(cp)
+coef = names(coef(fit11,k)[-1])
+coef = c("Mortality",coef)
+data11 = ex1217[,coef]
+fit11 = lm(Mortality~.,data11)
+coef = c(coef,"HC","NOX","SO2")
+data12 = ex1217[,coef]
+data12 = mutate(data12,HC = log(HC),NOX = log(NOX), SO2 = log(SO2))
+fit12 = lm(Mortality~.,data12)
+anova(fit11,fit12)
+```
+
+## The p value is 0.008313
+
+## b
+
+```{r}
+fit11 = regsubsets(Mortality~.,data=ex1217[,2:14],nvmax=13,nbest=1,method = "forward")
+cp = summary(fit11)$cp
+BIC = summary(fit11)$bic
+plot(cp)
+plot(BIC)
+k = which.min(cp)
+coef = names(coef(fit11,k)[-1])
+coef = c("Mortality",coef)
+data11 = ex1217[,coef]
+fit11 = lm(Mortality~.,data11)
+coef = c(coef,"HC","NOX","SO2")
+data12 = ex1217[,coef]
+data12 = mutate(data12,HC = log(HC),NOX = log(NOX), SO2 = log(SO2))
+fit12 = lm(Mortality~.,data12)
+anova(fit11,fit12)
+```
+
+## The p value is 0.008162, which is almost the same.
+
+# 2. Chapter 12, problem 20
+```{r}
+data(ex1220)
+data = select(ex1220,-Island,-Native)
+fit21 = regsubsets(Total~.,data,nvmax=7,nbest=1,force.in = "Area")
+k = which.min(summary(fit21)$cp)
+coef = names(coef(fit21,k)[-1])
+```
+
+## For the total number of species, the variable selected were "Area"     "Elev"     "DistSc"   "AreaNear".
+
+```{r}
+data = select(ex1220,-Island,-Total)
+fit21 = regsubsets(Native~.,data,nvmax=7,nbest=1,force.in = "Area")
+k = which.min(summary(fit21)$cp)
+coef = names(coef(fit21,k)[-1])
+```
+
+## For the natives, the variable selected were "Area"     "Elev"     "DistSc"   "AreaNear".
+
+```{r}
+data = ex1220 %>%
+   mutate(Native = Total-Native)%>%
+   select(-Island,-Total) 
+fit21 = regsubsets(Native~.,data,nvmax=7,nbest=1,force.in = "Area")
+k = which.min(summary(fit21)$cp)
+coef = names(coef(fit21,k)[-1])
+```
+
+## For the non-natives, the variable selected were "Area"     "Elev"     "AreaNear".
+
+# 3. Chapter 20, problem 11
+
+## a
+
+```{r}
+data(ex2011)
+logit <- glm(Failure ~ Temperature, ex2011,family = "binomial")
+summary(logit)
+```
+
+## Intercept: 10.87535   sd: 5.70291
+## Temperature: -0.17132   sd: 0.08344
+
+## b
+```{r}
+pnorm(-2.053)
+```
+
+## The one sided p value is 0.02. 
+
+## c
+```{r}
+anova(logit,test="LRT")
+```
+
+## The p value is 0.01477. 
+
+## d
+```{r}
+confint.default(logit)
+```
+
+## Confidence interval for Temperature is (-0.3348573, -0.007783746)
+
+## e
+```{r}
+prob = predict.glm(logit, data.frame(Temperature = 31), type="response")
+problogit = predict.glm(logit, data.frame(Temperature = 31))
+```
+
+## The logit of the probability is 5.564414. The prediction of the probability of failure is 0.9961828.
+
+## f
+## Because the standard deviation of the estimate is positively related to the squared distance of the new obs and X bar. So a new obs out of the range of the exsisting Xs would lead to a prediction with high variance. 
+
+# 4. Chapter 20, problem 15
+
+## a
+```{r}
+attach(ex2015)
+p = vector()
+for(i in 1:7){
+  p = c(p,t.test(ex2015[1:30,i+1],ex2015[31:60,i+1],alternative="less")$p.value)
+}
+```
+
+## For ring 1 to 7 the p value is $`r p`$ .
+
+## b
+```{r}
+logit = glm(Site~.,ex2015,family = "binomial")
+summary(logit)
+```
+
+## As we can see, only ring2 and ring3 are significant, which means within 1.4km radius.
