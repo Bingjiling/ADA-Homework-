@@ -1,0 +1,85 @@
+---
+title: "Homework9"
+author: "Yanyu Zheng yz2690"
+date: "April 13, 2016"
+output: pdf_document
+---
+
+# 1. Chapter 20, problem 12
+
+## a
+
+```{r}
+library("Sleuth3")
+library("ggplot2")
+attach(ex2012)
+ggplot(ex2012, aes(x=log(CK), y=H, shape=Group)) + geom_point()
+```
+
+## Yes, we can see possible connections in the plot.
+
+## b
+
+```{r}
+myLogit1 = glm(Group ~ CK + I(CK^2), data = ex2012, family = "binomial")
+summary(myLogit1)
+
+```
+
+## Squared term is not significant for CK or log(CK).
+
+## c
+```{r}
+myLogit2 = glm(Group ~ log(CK) + I(log(CK)^2), family = "binomial")
+summary(myLogit2)
+```
+
+## I choose the first model with the original scale, since the intercept and CK is significant, while the log scale model has nothing significant.
+
+##d
+
+```{r}
+myLogit3 = glm(Group ~ log(CK) + H, family = "binomial")
+myLogit4 = glm(Group ~ 1, family = "binomial")
+anova(myLogit3, myLogit4)
+```
+
+##e
+
+```{r}
+p1 = predict(myLogit3, data.frame(CK = 80, H = 85))
+p2 = predict(myLogit3, data.frame(CK = 300, H = 100))
+inv1 = exp(p1)/(1+exp(p1))
+inv2 = exp(p2)/(1+exp(p2))
+inv1/inv2
+detach(ex2012)
+```
+
+# 2. Chapter 21, problem 16
+```{r}
+attach(ex2116)
+odd = Tumor/Total
+oddL = exp(odd)/(1+exp(odd))
+fit = lm(oddL ~ Dose)
+summary(fit)
+plot(fit$residuals)
+## We can see non-linearity in the plot, try log transfer and square term
+fit2 = lm(oddL ~ log(Dose)+log(Dose)^2)
+fit2
+```
+
+## From the model, we can see the dose and the odd is definetly related. And we do a F-test to see if the difference is really significant between group.
+
+```{r}
+fitN = lm(oddL~1)
+anova(fit,fitN)
+```
+
+## Again, it is significant. 
+
+```{r}
+fitNew = lm(Dose ~ odd)
+predict(fitNew, data.frame(odd=0.5))
+```
+
+## The dose causing 50% tumor rate is about 0.07634605.
